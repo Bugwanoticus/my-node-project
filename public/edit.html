@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Tasks</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { margin-bottom: 0.2rem; }
+    form { margin-bottom: 1rem; }
+    label { display: block; margin: 0.3rem 0; }
+    input[type="text"] { width: 250px; padding: 0.2rem; }
+    button { margin-top: 0.3rem; padding: 0.3rem 0.6rem; }
+    ul { padding-left: 1.2rem; }
+    li { margin: 0.2rem 0; }
+    .top-links { margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Edit Tasks</h1>
+  <p>Add or remove tasks. Changes will show up on the home page.</p>
+
+  <div class="top-links">
+    <a href="/">Back to Home</a>
+  </div>
+
+  <form id="add-form">
+    <label>
+      New task:
+      <input type="text" name="name" id="name" required />
+    </label>
+    <button type="submit">Add Task</button>
+  </form>
+
+  <h2>Current Tasks</h2>
+  <ul id="items"></ul>
+
+  <script>
+    async function fetchItems() {
+      const res = await fetch("/api/items");
+      const data = await res.json();
+      return data;
+    }
+
+    async function renderItems() {
+      const items = await fetchItems();
+      const list = document.getElementById("items");
+      list.innerHTML = "";
+
+      if (!items.length) {
+        list.innerHTML = "<li><em>No items yet.</em></li>";
+        return;
+      }
+
+      for (const item of items) {
+        const li = document.createElement("li");
+        li.textContent = `#${item.id}: ${item.name} `;
+
+        const btn = document.createElement("button");
+        btn.textContent = "Delete";
+        btn.addEventListener("click", () => deleteItem(item.id));
+
+        li.appendChild(btn);
+        list.appendChild(li);
+      }
+    }
+
+    async function deleteItem(id) {
+      await fetch("/api/items/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      renderItems();
+    }
+
+    document.getElementById("add-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = document.getElementById("name");
+      const name = input.value.trim();
+      if (!name) return;
+
+      await fetch("/api/items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+
+      input.value = "";
+      renderItems();
+    });
+
+    renderItems();
+  </script>
+</body>
+</html>

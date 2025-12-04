@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Home – Task List</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { margin-bottom: 0.2rem; }
+    ul { padding-left: 1.2rem; }
+    li { margin: 0.2rem 0; }
+    .top-links { margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Task List</h1>
+  <p>This data comes from the Node.js server.</p>
+
+  <div class="top-links">
+    <a href="/edit">Go to Edit Page</a>
+  </div>
+
+  <ul id="items"></ul>
+
+  <script>
+    async function loadItems() {
+      try {
+        const res = await fetch("/api/items");
+        const data = await res.json();
+
+        const list = document.getElementById("items");
+        list.innerHTML = "";
+
+        if (!data.length) {
+          list.innerHTML = "<li><em>No items yet. Add some on the edit page!</em></li>";
+          return;
+        }
+
+        for (const item of data) {
+          const li = document.createElement("li");
+          li.textContent = `#${item.id}: ${item.name}`;
+          list.appendChild(li);
+        }
+      } catch (err) {
+        console.error("Failed to load items", err);
+      }
+    }
+
+    loadItems();
+  </script>
+</body>
+</html>
