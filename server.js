@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("server.db")
 
@@ -12,25 +11,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const DATA_FILE = path.join(__dirname, 'data.json');
-
-let items = [];
-
 db.exec(`
   CREATE TABLE IF NOT EXISTS items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL
   );
 `);
-
-
-function saveData() {
-    try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(items, null, 2), "utf8");
-    } catch (error) {
-        console.error("Error saving data:", error);
-    }
-}
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
