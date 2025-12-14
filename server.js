@@ -1,6 +1,9 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const sqlite3 = require("sqlite3").verbose();
+const db = new sqlite3.Database("server.db")
+
 
 const app = express();
 const PORT = 3000;
@@ -13,23 +16,12 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 
 let items = [];
 
-function loadData() {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const raw = fs.readFileSync(DATA_FILE, "utf8");
-      items = JSON.parse(raw);
-    } else {
-      items = [
-        { id: 1, name: "Learn Node.js" },
-        { id: 2, name: "Build a small project" }
-      ];
-      saveData();
-    }
-  } catch (error) {
-    console.error("Error loading data:", error);
-    items = [];
-  }
-}
+db.exec(`
+  CREATE TABLE IF NOT EXISTS items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL
+  );
+`);
 
 
 function saveData() {
@@ -40,8 +32,6 @@ function saveData() {
     }
 }
 
-loadData();
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
@@ -51,34 +41,47 @@ app.get('/edit', (req, res) => {
 });
 
 app.get('/api/items', (req, res) => {
-    res.json(items);
+  db.all("SELECT id, name FROM items ORDER BY id ASC",
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: err.message});
+    }
+    res.json(rows);
+  });
 });
+
 
 app.post('/api/items', (req, res) => {
     const name = req.body.name?.trim();
     if (!name) {
         return res.status(400).json({ error: "Name is required" });
     }
+
+    db.run(
+      "INSERT INTO items (name) VALUES (?)" ,
+      [name],
+      function (err) {
+        if (err) return res.status(500).json({ error: err.message});
+
+        res.status(201).json({ id: this.lastID, name});
+      }
+    );
+  });
     
-    const newItem = {
-        id: items.length ? items[items.length - 1].id + 1 : 1,
-        name,
-    };
-    items.push(newItem);
-    saveData();
-    res.status(201).json(newItem);
-});
 
 app.post('/api/items/delete', (req, res) => {
     const id = Number(req.body.id);
-    const before = items.length;
-    items = items.filter(item => item.id !== id);
-    if (items.length === before) {
-        return res.status(404).json({ error: "Item not found" });
-    }
-    saveData();
-    res.json({ success: true });
-});
+    
+    db.run("DELETE FROM items WHERE id = ?", [id], function (err) {
+      if (err) return res.status(500).json({ error: err.message});
+
+      if(this.changes === 0) {
+        return res.status(404).json({ error: "item not found" });
+      }
+
+      res.json({ success: true});
+    });
+  });
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
