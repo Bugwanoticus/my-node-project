@@ -12,17 +12,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 db.exec(`
-  PRAGMA foreign_keys = ON;
-
+  "PRAGMA foreign_keys = ON;"
+  
   CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL UNIQUE
-  );
-`);
 
-db.exec(`
-  "PRAGMA foreign_keys = ON;"
 
   CREATE TABLE IF NOT EXISTS items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
