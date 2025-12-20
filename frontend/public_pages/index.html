@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Landing Page - Task Lists</title>
+  <title>Landing Page - Login Page</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     h1 { margin-bottom: 0.2rem; }
@@ -12,14 +12,15 @@
   </style>
 </head>
 <body>
-  <h1>Task List</h1>
-  <p>This data comes from the Node.js server.</p>
+  <h1>Login</h1>
+  <p>This will connect you to the task list server</p>
 
-  <div class="top-links">
-    <a href="/edit">Go to Edit Page</a>
+  <div class="signup_link">
+    <p>If you do not have an account you can sign up for one here</p>
+    <a href="/signup">Signup</a>
   </div>
 
-  <ul id="items"></ul>
+  <ul id="login"></ul>
 
   <script>
     async function loadItems() {
