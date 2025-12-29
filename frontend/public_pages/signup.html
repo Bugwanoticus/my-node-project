@@ -54,17 +54,24 @@
           let data;
           try {
             data = raw ? JSON.parse(raw) : {};
+
           } catch { 
             data = { error: raw || "Non-JSON response from server"}
           }
 
+          console.log("FULL RESPONSE:", data);
+          console.log("typeof message:", typeof data.message);
+          console.log("typeof error:", typeof data.error);
 
           if (!res.ok) {
-            if (data.errors) {
-                const msg = Object.values(data.errors).flat().join(", ");
-                errorEl.textContent = msg;
+            if (data.errors && typeof data.errors === "object") {
+              errorEl.textContent = Object.values(data.errors).flat().join(", ");
+            } else if (typeof data.message === "string") {
+              errorEl.textContent = data.message;
+            } else if (typeof data.error === "string") {
+              errorEl.textContent = data.error;
             } else {
-                errorEl.textContent = data.message || data.error || "Signup failed";
+              errorEl.textContent = "Signup failed";
             }
             return;
           }

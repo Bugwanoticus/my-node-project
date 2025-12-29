@@ -3,14 +3,14 @@ const router = express.Router();
 const db = require('../db/connection');
 
 
-// API/USERS
+// start API/USERS
 // GET /api/users
 router.get('/users', (req, res) => {
   db.all("SELECT id, name FROM users ORDER BY id ASC", (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
-    res.json(rows);
+    res.json(rows);3
   });
 });
 
@@ -38,10 +38,10 @@ router.post('/users/delete', (req, res) => {
     res.json({ success: true });
   });
 });
+//end API/USERS
 
 
-
-// API/LISTS
+// start API/LISTS
 // GET /api/lists
 router.get('/', (req, res) => {
   db.all("SELECT id, name FROM lists ORDER BY id ASC", (err, rows) => {
@@ -77,10 +77,11 @@ router.post('/lists/delete', (req, res) => {
     }
     });
 });
+// end API/LISTS
 
 
 
-// API/TASKS
+// start API/TASKS
 //GET /api/tasks
 router.get('/tasks', (req, res) => {
   db.all("SELECT id, name FROM tasks ORDER BY id ASC", (err, rows) => {
@@ -116,5 +117,6 @@ router.post('/tasks/delete', (req, res) => {
     res.json({ success: true });
   });
 });
+// end API/TASKS
 
 module.exports = router;
