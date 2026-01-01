@@ -18,21 +18,25 @@
     <form id="signup-form">
     <label for="username">Username:</label> 
     <input id="username" name="username" type="text" autocomplete="username" required/>
+    <div class="error" data-error-for="username"></div>
     <div class="hint">(Username must be at least 3-12 characters long)</div>
     <br />
     <br />
 
     <label for="password">Password:</label>
     <input id="password" name="password" type="password" autocomplete="new-password" required/>
+    <div class="error" data-error-for="password"></div>
     <br />
     <label for="confirm_password">Confirm Password:</label>
     <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" required/><br />
+    <div class="error" data-error-for="confirm_password"></div>
     <div class="hint">(Password must be at least 6-20 characters long, contain one letter, one number, and one special character)</div>
     <br />
     <br />
 
     <label for="email">Email:</label>
     <input id="email" name="email" type="email" required/>
+    <div class="error" data-error-for="email"></div>
     <br />
     <br />
 
@@ -42,27 +46,29 @@
     <p id="error" style="color:red;"></p>
 
   <script>
-    
+    //need to transfer this to signup.js
     document.getElementById("signup-form").addEventListener("submit", async (e) => {
         e.preventDefault();
         const errorEl = document.getElementById("error");
         errorEl.textContent = "";
     
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value;
-        const confirm_password = document.getElementById("confirm_password").value;
-        const email = document.getElementById("email").value.trim();
+        const signupData = {
+          username: document.getElementById("username").value.trim(),
+          password: document.getElementById("password").value,
+          confirm_password: document.getElementById("confirm_password").value,
+          email: document.getElementById("email").value.trim()
+        };
 
-        if (password !== confirm_password) {
-          console.log("passwords do not match")
-          return;
+        const errors = validateSignup(signupData); 
+        if (errors) {
+          
         }
 
         try {
           const res = await fetch("/api/signup", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username, password, confirm_email, email })
+              body: JSON.stringify({ username, password, confirm_password, email })
           });
           const raw = await res.text();
           
