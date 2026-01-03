@@ -18,10 +18,10 @@ app.use(express.json());
 // serve static frontend
 app.use(express.static(path.join(__dirname, "frontend", "public_pages")));
 
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "frontend", "index.html")));
-app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, "frontend", "signup.html")));
-app.get("/reset", (req, res) => res.sendFile(path.join(__dirname, "frontend", "password_reset.html")));
-app.get("/tasks", (req, res) => res.sendFile(path.join(__dirname, "frontend", "tasks.html")));
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "frontend", "login_page", "index.html")));
+app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, "frontend", "signup_page", "signup.html")));
+app.get("/reset", (req, res) => res.sendFile(path.join(__dirname, "frontend", "password_page", "password_reset.html")));
+app.get("/tasks", (req, res) => res.sendFile(path.join(__dirname, "frontend", "tasks_page", "tasks.html")));
 
 // mount API routes
 app.use("/api", authRoutes);

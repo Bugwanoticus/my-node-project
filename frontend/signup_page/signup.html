@@ -43,67 +43,7 @@
     <button type="submit">Create Account</button>
     </form>
 
-    <p id="error" style="color:red;"></p>
-
-  <script>
-    //need to transfer this to signup.js
-    document.getElementById("signup-form").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const errorEl = document.getElementById("error");
-        errorEl.textContent = "";
-    
-        const signupData = {
-          username: document.getElementById("username").value.trim(),
-          password: document.getElementById("password").value,
-          confirm_password: document.getElementById("confirm_password").value,
-          email: document.getElementById("email").value.trim()
-        };
-
-        const errors = validateSignup(signupData); 
-        if (errors) {
-          
-        }
-
-        try {
-          const res = await fetch("/api/signup", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username, password, confirm_password, email })
-          });
-          const raw = await res.text();
-          
-          let data;
-          try {
-            data = raw ? JSON.parse(raw) : {};
-
-          } catch { 
-            data = { error: raw || "Non-JSON response from server"}
-          }
-
-          console.log("FULL RESPONSE:", data);
-          console.log("typeof message:", typeof data.message);
-          console.log("typeof error:", typeof data.error);
-
-          if (!res.ok) {
-            if (data.errors && typeof data.errors === "object") {
-              errorEl.textContent = Object.values(data.errors).flat().join(", ");
-            } else if (typeof data.message === "string") {
-              errorEl.textContent = data.message;
-            } else if (typeof data.error === "string") {
-              errorEl.textContent = data.error;
-            } else {
-              errorEl.textContent = "Signup failed";
-            }
-            return;
-          }
-
-          // success = go to the app
-          window.location.href = "/";
-      } catch (err) {
-      console.error("Signup error has occured", err);
-      errorEl.textContent = " Could not reach server. Connection check?";
-      }
-    });
-  </script>
+    <p id="globalerror" style="color:red;"></p>
+    <script src="signup.js"></script>
 </body>
 </html>

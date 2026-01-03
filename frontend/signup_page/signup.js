@@ -5,17 +5,37 @@ function showErrors(errors) {
 
     Object.entries(errors).forEach(([field, messages]) => {
         const el = document.querySelector(
-            '[data-error-for="${field}"'
+            `[data-error-for="${field}"]`
         );
         if (el) {
-            el.textContent = messages.join(", ");
+            el.textContent = Array.isArray(messages) 
+                ? messages.join(", ") 
+                : String(messages);
         }
     });
 }
 
+//resetting previous errors
+
+function showServerError(err) {
+    console.error("Server error:", err);
+
+    const el = document.getElementById("global-error");
+    if (!el) return;
+
+    if (typeof err === "string") {
+        el.textContent = err;
+    } else {
+        el.textContent = "An unknown error occurred.";
+    }
+}
+
 document
-    .getElementById("signup-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    .getElementById("signup-form")
+    .addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        document.getElementById("global-error").textContent = "";
 
     const signupData = {
         username: document.getElementById("username").value.trim(),
@@ -31,17 +51,9 @@ document
     }
 
     try {
-        const res = await fetch("/api/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password, confirm_password, email })
-        });
-        const raw = await res.text();
-
-    // success = go to the app
-    window.location.href = "/";
-      } catch (err) {
-      console.error("Signup error has occured", err);
-      errorEl.textContent = " Could not reach server. Connection check?";
+        await application.signup(signupData);
+        window.location.href = "/";
+    } catch (err) {
+        showServerError(err);
       }
     });

@@ -3,7 +3,7 @@ console.log("🔥 AUTH SERVICE LOADED - NEW VERSION");
 // backend/services/auth.service.js
 const bcrypt = require("bcrypt");
 
-function validateSignup(username, password, confirm_password, email) {
+function validateSignup({username, password, confirm_password, email}) {
     const errors = {};
 
     const usernameErrors = [];
@@ -33,17 +33,30 @@ function validateSignup(username, password, confirm_password, email) {
             passwordErrors.push("Password must contain at least one number");
         if (!/[!@#$%^&*()]/.test(password)) 
             passwordErrors.push("Password must contain at least one special character");
-        if (password !== confirm_password)
-            passwordErrors.push("Password and confirm password must match")
-}
+    }
     if (passwordErrors.length > 0) {
         errors.password = passwordErrors;
 }
 
-    const email = [];
+
+    const confirmPasswordErrors = [];
+    if (!confirm_password) {
+        confirmPasswordErrors.push("Confirm password is required");
+    } else {
+        if (confirm_password && password !== confirm_password)
+            passwordErrors.push("Password and confirm password must match")
+}
+    if (confirmPasswordErrors.length > 0) {
+        errors.confirm_password = confirmPasswordErrors;
+    }
+
+
+    const emailErrors = [];
     if (!email) {
         emailErrors.push("Email is required");
-    } 
+    } else if   (!/^\S+@\S+\.\S+$/.test(email)) {
+        emailErrors.push("Email must be a valid address");
+    }
     if (emailErrors.length > 0) {
         errors.email = emailErrors
     }
